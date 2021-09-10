@@ -12,4 +12,16 @@ class BitVectorTest {
         assertFalse(v.get(7));
     }
 
+    @Test
+    void setsBit() {
+        BitVector v = new BitVector();
+        v.set(4);
+        assertTrue(v.get(4));
+    }
+
+    @Test
+    void unsetBit() {
+        
+    }
+
 }
