@@ -2,34 +2,45 @@ package bloom;
 
 public class BloomFilter<S> {
 
-    private BloomFilter<S> filter;
+   // private long[] bitTable = new long[1024];
+    private static final int MASK = (1<<16)-1;
 
+    private long[] bitTable;
+    public BloomFilter() {
+        bitTable = new long[1024];
+    }
 
-    public long hashCode(String s) {
-        long sum = 0;
-        char ch[];
-        ch = s.toCharArray();
+    public long hashCode(S object) {
+        int hashCode = object.hashCode();
+        return hashCode;
+    }
 
-        for (int i = 0; i < s.length(); i++) {
-            sum += ch[i];
+    public void addBit(int key) {
+        bitTable[key/64] |= 1L << (key % 64);
+    }
+
+    public void add(S object) {
+        int hashCode = object.hashCode();
+        addBit(hashCode & MASK);
+        addBit((hashCode >>> 16) & MASK);
+    }
+
+    public boolean containsBit(int key) {
+        return ((bitTable[key / 64] & (1L << (key % 64))) != 0);
+    }
+
+    public boolean mightContain(S object) {
+        int hashCode = object.hashCode();
+        return containsBit(hashCode & MASK) && containsBit((hashCode >>> 16) & MASK);
+    }
+
+    public long trueBits() {
+        int bitCount = 0;
+        for (int i = 0; i < 1024; i++) {
+            if (bitTable[i] != 0) {
+                bitCount++;
+            }
         }
-        return sum % 10;
-    }
-
-    public void add(String s) { //marking proper bit as 1, website % = bit to turn on
-        long variable = 0;
-        variable = hashCode(s);
-
-    }
-
-    public boolean mightContain(String s) { //check if bit is on
-
-
-        return false;
-    }
-
-    public long trueBits() { //just count them
-
-        return -1;
+        return bitCount;
     }
 }
